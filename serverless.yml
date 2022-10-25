@@ -1,16 +1,53 @@
 org: refririfwan
 app: iot-platform-app
 service: iot-platform
-frameworkVersion: '3'
+frameworkVersion: "3"
 
 provider:
   name: aws
   runtime: nodejs14.x
+  environment:
+    user_pool_id: { Ref: UserPool }
+    client_id: { Ref: USerClient }
+  iamRoleStatements:
+    -Effect: Allow
+      Action: 
+        - cognito-idp:AdminInitiateAuth
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminSetUserPassword
+      Resource: "*"
 
 functions:
-  hello:
-    handler: handler.hello
+  loginUser:
+    handler: user/login.handler
     events:
       - httpApi:
-          path: /
-          method: get
+          path: user/login
+          method: post
+          cors: true
+
+resources:
+  Resources:
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: serverless-auth-pool
+        Schema:
+          - Name: email
+            Required: true
+            Mutable: true
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 6
+        AutoVerifiedAttributes: ["email"]
+
+    UserClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: user-pool-ui
+        GenerateSecret: false
+        UserPoolId: {Ref: UserPool }
+        AccessTokenValidity: 5
+        IdTokenValidity: 5
+        ExplicitAuthFlows:
+          - "ADMIN_NO_SRP_AUTH"
