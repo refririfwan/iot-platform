@@ -8,12 +8,18 @@ provider:
   environment:
     USERS_POOL_ID: { Ref: UserPool }
     CLIENT_ID: { Ref: UserClient }
+    DYNAMODB_TABLE: ${self:service}-IoT-${sls:stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
         - cognito-idp:AdminInitiateAuth
         - cognito-idp:AdminCreateUser
         - cognito-idp:AdminSetUserPassword
+        - dynamodb:Query
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
       Resource: "*"
 
 functions:
@@ -24,7 +30,6 @@ functions:
           path: user/login
           method: post
           cors: true
-
   signupUser:
     handler: user/signup.handler
     events:
@@ -32,7 +37,6 @@ functions:
           path: user/signup
           method: post
           cors: true
-
   privateAPI:
     handler: user/private.handler
     events:
@@ -64,7 +68,6 @@ resources:
           PasswordPolicy:
             MinimumLength: 6
         AutoVerifiedAttributes: ["email"]
-
     UserClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
@@ -75,3 +78,18 @@ resources:
         IdTokenValidity: 5
         ExplicitAuthFlows:
           - "ADMIN_NO_SRP_AUTH"
+    IoTDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: metadata
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: metadata
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
