@@ -27,27 +27,43 @@ functions:
     handler: user/login.handler
     events:
       - http:
-          path: user/login
+          path: login
           method: post
           cors: true
   signupUser:
     handler: user/signup.handler
     events:
       - http:
-          path: user/signup
+          path: signup
           method: post
           cors: true
   privateAPI:
     handler: user/private.handler
     events:
       - http:
-          path: user/private
+          path: private
           method: post
           cors: true
           authorizer:
             name: PrivateAuthorizer
             type: COGNITO_USER_POOLS
             arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  createUser:
+    handler: user/create-user.handler
+    events:
+      - http: 
+          path: user
+          method: post
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: 
               Fn::GetAtt:
                 - UserPool
                 - Arn

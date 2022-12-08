@@ -1,4 +1,4 @@
-const { nanoid } = require('nanoid');
+const { nanoid } = require('nanoid')
 const AWS = require('aws-sdk')
 const sendResponse = require('../utils/response')
 const validateInput = require('../utils/validation')
@@ -73,13 +73,22 @@ module.exports.handler = async (event) => {
             province: '',
             country: '',
             zip_code: '',
-          },
+          }
         }
 
         // put item data user detail in dynamodb
         await dynamoDb.put(userDetailParams).promise()
 
-        return sendResponse(201, { message: 'User registration successful' })
+        return sendResponse(201, 
+          { 
+            message: 'User registration successful', 
+            data: 
+            {
+              user: userParams.Item, 
+              userDetail: userDetailParams.Item
+            } 
+          }
+        )
     }
     catch (error) {
         const message = error.message ? error.message : 'Internal server error'
