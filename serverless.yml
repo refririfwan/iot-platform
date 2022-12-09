@@ -116,6 +116,69 @@ functions:
                 - Arn
             claims:
               - email
+  createUserDetail:
+    handler: user/create-user-detail.handler
+    events:
+      - http: 
+          path: user/detail
+          method: post
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: 
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  getUserDetail:
+      handler: user/get-user-detail.handler
+      events:
+        - http:
+            path: user/detail/{userId}/{email}
+            method: get
+            authorizer:
+              name: PrivateAuthorizer
+              type: COGNITO_USER_POOLS
+              arn:
+                Fn::GetAtt:
+                  - UserPool
+                  - Arn
+              claims:
+                - email
+  updateUserDetail:
+    handler: user/update-user-detail.handler
+    events:
+      - http:
+          path: user/detail
+          method: put
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  deleteUserDetail:
+    handler: user/delete-user-detail.handler
+    events:
+      - http:
+          path: user/detail/{userId}/{email}
+          method: delete
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
 
 resources:
   Resources:

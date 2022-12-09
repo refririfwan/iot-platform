@@ -4,9 +4,9 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient()
 
 module.exports.handler = async (event) => {
   try {
-    const { email, userId } = event.pathParameters
-    const id = 'email#'+email
-    const metadata = 'user#'+userId
+    const { userId, email } = event.pathParameters
+    const id = 'user#'+userId
+    const metadata = 'email#'+email
     const params = {
       TableName: process.env.DYNAMODB_TABLE,
       Key: {
@@ -14,8 +14,8 @@ module.exports.handler = async (event) => {
         metadata: metadata
       }
     }
-    const user = await dynamoDb.get(params).promise()
-    return sendResponse(200, { message: 'Success get data user', data: user.Item })
+    await dynamoDb.delete(params).promise()
+    return sendResponse(200, { message: 'Success delete data user detail' })
   }
   catch (error) {
     const message = error.message ? error.message : 'Internal server error'
