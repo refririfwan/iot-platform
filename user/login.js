@@ -33,7 +33,7 @@ module.exports.handler = async (event) => {
         }
         const user = await dynamoDb.query(userParams).promise()
 
-        return sendResponse(200, { message: 'Success', token: response.AuthenticationResult.IdToken, data: user.Items })
+        return sendResponse(200, { message: 'User login successful', token: response.AuthenticationResult.IdToken, data: user.Items })
     }
     catch (error) {
         const message = error.message ? error.message : 'Internal server error'

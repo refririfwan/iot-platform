@@ -15,7 +15,7 @@ module.exports.handler = async (event) => {
       }
     }
     const user = await dynamoDb.get(params).promise()
-    return sendResponse(200, { message: 'Success', data: user.Item })
+    return sendResponse(200, { message: 'Success add new data user', data: user.Item })
   }
   catch (error) {
     const message = error.message ? error.message : 'Internal server error'
