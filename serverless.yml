@@ -69,6 +69,21 @@ functions:
                 - Arn
             claims:
               - email
+  getUser:
+    handler: user/get-user.handler
+    events:
+      - http:
+          path: user/{email}/{userId}
+          method: get
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
 
 resources:
   Resources:
