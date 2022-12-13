@@ -194,6 +194,162 @@ functions:
                 - Arn
             claims:
               - email
+  getDeviceByUserId:
+    handler: device/get-device-by-user-id.handler
+    events:
+      - http:
+          path: device/{userId}
+          method: get 
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  getDeviceDataByDeviceId:
+    handler: device/get-device-data-by-device-id.handler
+    events:
+      - http:
+          path: device/data/{deviceId}
+          method: get 
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  createDevice:
+    handler: device/create-device.handler
+    events:
+      - http: 
+          path: device
+          method: post
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: 
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  getDevice:
+    handler: device/get-device.handler
+    events:
+      - http:
+          path: device/{userId}/{deviceId}
+          method: get
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  updateDevice:
+    handler: device/update-device.handler
+    events:
+      - http:
+          path: device
+          method: put
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  deleteDevice:
+    handler: device/delete-device.handler
+    events:
+      - http:
+          path: device/{userId}/{deviceId}
+          method: delete
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  createDeviceData:
+    handler: device/create-device-data.handler
+    events:
+      - http: 
+          path: device/data
+          method: post
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: 
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  getDeviceData:
+    handler: device/get-device-data.handler
+    events:
+      - http:
+          path: device/data/{deviceId}/{dataId}
+          method: get
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  updateDeviceData:
+    handler: device/update-device-data.handler
+    events:
+      - http:
+          path: device/data
+          method: put
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  deleteDeviceData:
+    handler: device/delete-device-data.handler
+    events:
+      - http:
+          path: device/data/{deviceId}/{dataId}
+          method: delete
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
 
 resources:
   Resources:

@@ -13,8 +13,8 @@ module.exports.handler = async (event) => {
     const city = data.city
     const province = data.province
     const country = data.country
-    const zip_code = data.zip_code
-    const phone_number = data.phone_number
+    const zip_code = data.zipCode
+    const phone_number = data.phoneNumber
     const params = {
       TableName: process.env.DYNAMODB_TABLE,
       Key: {
@@ -25,8 +25,8 @@ module.exports.handler = async (event) => {
       ExpressionAttributeNames: {"#updated_at":"updated_at","#name":"name","#address":"address","#city":"city","#province":"province","#country":"country","#zip_code":"zip_code","#phone_number":"phone_number"},
       ExpressionAttributeValues: {":updated_at": timestamp, ":name": name, ":address": address, ":city": city, ":province": province, ":country": country, ":zip_code": zip_code, ":phone_number": phone_number}
     }
-    const user = await dynamoDb.update(params).promise()
-    return sendResponse(200, { message: 'Success updated data user detail', data: user.Item })
+    await dynamoDb.update(params).promise()
+    return sendResponse(201, { message: 'Success updated data user detail' })
   }
   catch (error) {
     const message = error.message ? error.message : 'Internal server error'
