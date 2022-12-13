@@ -1,16 +1,392 @@
 org: refririfwan
 app: iot-platform-app
 service: iot-platform
-frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x
+  environment:
+    USERS_POOL_ID: { Ref: UserPool }
+    CLIENT_ID: { Ref: UserClient }
+    DYNAMODB_TABLE: ${self:service}-IoT-${sls:stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminInitiateAuth
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminSetUserPassword
+        - dynamodb:Query
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "*"
 
 functions:
-  hello:
-    handler: handler.hello
+  loginUser:
+    handler: user/login.handler
     events:
-      - httpApi:
-          path: /
+      - http:
+          path: login
+          method: post
+          cors: true
+  signupUser:
+    handler: user/signup.handler
+    events:
+      - http:
+          path: signup
+          method: post
+          cors: true
+  privateAPI:
+    handler: user/private.handler
+    events:
+      - http:
+          path: private
+          method: post
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  createUser:
+    handler: user/create-user.handler
+    events:
+      - http: 
+          path: user
+          method: post
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: 
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  getUser:
+    handler: user/get-user.handler
+    events:
+      - http:
+          path: user/{email}/{userId}
           method: get
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  updateUser:
+    handler: user/update-user.handler
+    events:
+      - http:
+          path: user
+          method: put
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  deleteUser:
+    handler: user/delete-user.handler
+    events:
+      - http:
+          path: user/{email}/{userId}
+          method: delete
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  createUserDetail:
+    handler: user/create-user-detail.handler
+    events:
+      - http: 
+          path: user/detail
+          method: post
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: 
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  getUserDetail:
+      handler: user/get-user-detail.handler
+      events:
+        - http:
+            path: user/detail/{userId}/{email}
+            method: get
+            authorizer:
+              name: PrivateAuthorizer
+              type: COGNITO_USER_POOLS
+              arn:
+                Fn::GetAtt:
+                  - UserPool
+                  - Arn
+              claims:
+                - email
+  updateUserDetail:
+    handler: user/update-user-detail.handler
+    events:
+      - http:
+          path: user/detail
+          method: put
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  deleteUserDetail:
+    handler: user/delete-user-detail.handler
+    events:
+      - http:
+          path: user/detail/{userId}/{email}
+          method: delete
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  getUserByEmail:
+    handler: user/get-user-by-email.handler
+    events:
+      - http:
+          path: user/{email}
+          method: get
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  getDeviceByUserId:
+    handler: device/get-device-by-user-id.handler
+    events:
+      - http:
+          path: device/{userId}
+          method: get 
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  getDeviceDataByDeviceId:
+    handler: device/get-device-data-by-device-id.handler
+    events:
+      - http:
+          path: device/data/{deviceId}
+          method: get 
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  createDevice:
+    handler: device/create-device.handler
+    events:
+      - http: 
+          path: device
+          method: post
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: 
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  getDevice:
+    handler: device/get-device.handler
+    events:
+      - http:
+          path: device/{userId}/{deviceId}
+          method: get
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  updateDevice:
+    handler: device/update-device.handler
+    events:
+      - http:
+          path: device
+          method: put
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  deleteDevice:
+    handler: device/delete-device.handler
+    events:
+      - http:
+          path: device/{userId}/{deviceId}
+          method: delete
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  createDeviceData:
+    handler: device/create-device-data.handler
+    events:
+      - http: 
+          path: device/data
+          method: post
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn: 
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  getDeviceData:
+    handler: device/get-device-data.handler
+    events:
+      - http:
+          path: device/data/{deviceId}/{dataId}
+          method: get
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  updateDeviceData:
+    handler: device/update-device-data.handler
+    events:
+      - http:
+          path: device/data
+          method: put
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+  deleteDeviceData:
+    handler: device/delete-device-data.handler
+    events:
+      - http:
+          path: device/data/{deviceId}/{dataId}
+          method: delete
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            arn:
+              Fn::GetAtt:
+                - UserPool
+                - Arn
+            claims:
+              - email
+
+resources:
+  Resources:
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: serverless-auth-pool
+        Schema:
+          - Name: email
+            Required: true
+            Mutable: true
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 6
+        AutoVerifiedAttributes: ["email"]
+    UserClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: user-pool-ui
+        GenerateSecret: false
+        UserPoolId: { Ref: UserPool }
+        AccessTokenValidity: 5
+        IdTokenValidity: 5
+        ExplicitAuthFlows:
+          - "ADMIN_NO_SRP_AUTH"
+    IoTDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: metadata
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: metadata
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
