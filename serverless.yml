@@ -75,6 +75,7 @@ functions:
       - http:
           path: user/{email}/{userId}
           method: get
+          cors: true
           authorizer:
             name: PrivateAuthorizer
             type: COGNITO_USER_POOLS
@@ -138,6 +139,7 @@ functions:
         - http:
             path: user/detail/{userId}/{email}
             method: get
+            cors: true
             authorizer:
               name: PrivateAuthorizer
               type: COGNITO_USER_POOLS
@@ -185,6 +187,7 @@ functions:
       - http:
           path: user/{email}
           method: get
+          cors: true
           authorizer:
             name: PrivateAuthorizer
             type: COGNITO_USER_POOLS
@@ -200,6 +203,7 @@ functions:
       - http:
           path: device/{userId}
           method: get 
+          cors: true
           authorizer:
             name: PrivateAuthorizer
             type: COGNITO_USER_POOLS
@@ -215,6 +219,7 @@ functions:
       - http:
           path: device/data/{deviceId}
           method: get 
+          cors: true
           authorizer:
             name: PrivateAuthorizer
             type: COGNITO_USER_POOLS
@@ -246,6 +251,7 @@ functions:
       - http:
           path: device/{userId}/{deviceId}
           method: get
+          cors: true
           authorizer:
             name: PrivateAuthorizer
             type: COGNITO_USER_POOLS
@@ -309,6 +315,7 @@ functions:
       - http:
           path: device/data/{deviceId}/{dataId}
           method: get
+          cors: true
           authorizer:
             name: PrivateAuthorizer
             type: COGNITO_USER_POOLS
